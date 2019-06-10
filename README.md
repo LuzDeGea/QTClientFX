@@ -1,2 +1,3 @@
-# QTClientFX
-QTClient con l'interfaccia grafica
+# QTServer
+
+Progetto MAP.
