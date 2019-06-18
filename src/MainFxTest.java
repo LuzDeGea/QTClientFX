@@ -22,16 +22,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import keyboardinput.Keyboard;
-
 public class MainFxTest extends Application {
 
 	private static ObjectOutputStream out;
 	private static ObjectInputStream in; // stream con richieste del client
 
 	Stage finestra;
-	Scene scene_menu, scene_file, scene_db, scene_error;
-	Scene scene_result_file, scene_result_db;
+	Scene scene_menu, scene_file, scene_db;
+	Scene scene_result_file, scene_result_db, scene_error;
 
 	public static void main(final String[] args) {
 		String ip = "127.0.0.1";// args[0];
@@ -52,8 +50,10 @@ public class MainFxTest extends Application {
 
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
+
 		finestra = primaryStage;
 		finestra.setTitle("QT");
+		finestra.getIcons().add(new Image("file:res/images/program_icon.png"));
 
 		// Menu //
 		Label label_menu = new Label("Seleiona una operazione:");
@@ -71,6 +71,31 @@ public class MainFxTest extends Application {
 		grid_menu.add(bottone_file, 1, 1);
 		grid_menu.add(bottone_db, 1, 2);
 		scene_menu = new Scene(grid_menu, 360, 150);
+
+		// pannello di errore //
+
+		Label label_error = new Label("Errore:");
+		GridPane grid_result_error = new GridPane();
+		grid_result_error.setPadding(new Insets(10, 10, 10, 10));
+		grid_result_error.setVgap(8);
+		grid_result_error.setHgap(10);
+
+		Image img_icon_error = new Image("file:res/images/error_icon.png", 20, 20, false, false);
+
+		Button bottone_chiudi_error = new Button("Chiudi il programma");
+		bottone_chiudi_error.setOnAction(e -> finestra.close());
+		bottone_chiudi_error.setWrapText(false);
+
+		TextArea error_result = new TextArea(); // area risultato error
+		error_result.setMinHeight(150);
+		error_result.setMaxWidth(350);
+		error_result.setEditable(false);
+
+		grid_result_error.add(label_error, 1, 1);
+		grid_result_error.add(error_result, 1, 2);
+		grid_result_error.add(bottone_chiudi_error, 1, 3);
+
+		scene_error = new Scene(grid_result_error, 450, 300);
 
 		// pannello risultato file//
 		GridPane grid_result_file = new GridPane();
@@ -96,6 +121,7 @@ public class MainFxTest extends Application {
 		TextArea file_result = new TextArea(); // area risultato file
 		file_result.setMinHeight(150);
 		file_result.setMaxWidth(350);
+		file_result.setEditable(false);
 
 		grid_result_file.add(bottone_menu_file, 1, 1);
 		grid_result_file.add(file_result, 1, 2);
@@ -132,24 +158,24 @@ public class MainFxTest extends Application {
 						file_result.setText(qt);
 						finestra.setScene(scene_result_file);
 					} catch (SocketException err) {
-						file_result.setText(err.getMessage());
-						finestra.setScene(scene_result_file);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 						return;
 					} catch (FileNotFoundException err) {
-						file_result.setText(err.getMessage());
-						finestra.setScene(scene_result_file);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 						return;
 					} catch (IOException err) {
-						file_result.setText(err.getMessage());
-						finestra.setScene(scene_result_file);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 						return;
 					} catch (ClassNotFoundException err) {
-						file_result.setText(err.getMessage());
-						finestra.setScene(scene_result_file);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 						return;
 					} catch (ServerException err) {
-						file_result.setText(err.getMessage());
-						finestra.setScene(scene_result_file);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 					}
 				}
 			}
@@ -184,6 +210,7 @@ public class MainFxTest extends Application {
 		TextArea db_result = new TextArea(); // area risultato db
 		db_result.setMinHeight(150);
 		db_result.setMaxWidth(350);
+		db_result.setEditable(false);
 
 		grid_result_db.add(bottone_menu_db, 1, 1);
 		grid_result_db.add(db_result, 1, 2);
@@ -216,22 +243,29 @@ public class MainFxTest extends Application {
 				} else {
 					// se va tutto bene
 					try {
-						storeTableFromDb(db_name.getText(), Integer.valueOf(db_radius.getText()));
+						storeTableFromDb(db_name.getText());
+
+						String clusterSet = learningFromDbTable(Integer.valueOf(db_radius.getText()));
+						db_result.setText(clusterSet);
+
+						finestra.setScene(scene_result_db);
+						storeClusterInFile();
+
 					} catch (SocketException err) {
-						db_result.setText(err.getMessage());
-						finestra.setScene(scene_result_db);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 					} catch (FileNotFoundException err) {
-						db_result.setText(err.getMessage());
-						finestra.setScene(scene_result_db);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 					} catch (IOException err) {
-						db_result.setText(err.getMessage());
-						finestra.setScene(scene_result_db);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 					} catch (ClassNotFoundException err) {
-						db_result.setText(err.getMessage());
-						finestra.setScene(scene_result_db);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 					} catch (ServerException err) {
-						db_result.setText(err.getMessage());
-						finestra.setScene(scene_result_db);
+						error_result.setText(err.getMessage());
+						finestra.setScene(scene_error);
 					}
 				}
 			}
@@ -250,6 +284,7 @@ public class MainFxTest extends Application {
 		finestra.show();
 
 	}
+
 	///////////////////////////////////////////////////////////
 
 	private String learningFromFile(final String table_name, final double radius)
@@ -268,12 +303,11 @@ public class MainFxTest extends Application {
 
 	}
 
-	private void storeTableFromDb(final String table_name, final double radius)
+	private void storeTableFromDb(final String table_name)
 			throws SocketException, ServerException, IOException, ClassNotFoundException {
 		out.writeObject(0);
 
 		out.writeObject(table_name);
-		out.writeObject(radius);
 
 		String result = (String) in.readObject();
 		if (!result.equals("OK")) {
@@ -282,18 +316,15 @@ public class MainFxTest extends Application {
 
 	}
 
-	private String learningFromDbTable() throws SocketException, ServerException, IOException, ClassNotFoundException {
+	private String learningFromDbTable(final double radius)
+			throws SocketException, ServerException, IOException, ClassNotFoundException {
 		out.writeObject(1);
-		double r = 1.0;
-		do {
-			System.out.print("Radius:");
-			r = Keyboard.readDouble();
-		} while (r <= 0);
-		out.writeObject(r);
+
+		out.writeObject(radius);
+
 		String result = (String) in.readObject();
 		if (result.equals("OK")) {
-			System.out.println("Number of Clusters:" + in.readObject());
-			return (String) in.readObject();
+			return "Number of Clusters: " + in.readObject() + "\n" + (String) in.readObject();
 		} else {
 			throw new ServerException(result);
 		}
