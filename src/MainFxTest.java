@@ -41,7 +41,7 @@ public class MainFxTest extends Application {
 	private ObjectInputStream in; // stream con richieste del client
 
 	Stage finestra;
-	Scene scene_menu, scene_file, scene_db;
+	Scene scene_menu, scene_file, scene_db, scene_info, scene_credits;
 	Scene scene_result_file, scene_result_db, scene_error, scene_server;
 
 	public static void main(final String[] args) {
@@ -207,17 +207,45 @@ public class MainFxTest extends Application {
 		help_subMenu1.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
-				TextArea info_t = new TextArea("a");
+				GridPane grid_info = new GridPane();
+				grid_info.setPadding(new Insets(10, 10, 10, 10));
+				grid_info.setVgap(8);
+				grid_info.setHgap(10);
 
-				Alert info = new Alert(AlertType.NONE, info_t.getText(), ButtonType.OK);
-				info.show();
+				Image img_icon_info = new Image("file:res/images/house_icon.png", 20, 20, false, false);
+
+				Button bottone_menu_info = new Button();
+				bottone_menu_info.setOnAction(e2 -> finestra.setScene(scene_menu));
+				bottone_menu_info.setWrapText(false);
+				bottone_menu_info.setGraphic(new ImageView(img_icon_info));
+				bottone_menu_info.setStyle("-fx-border-color: #000000; -fx-background-color: #00ff00");
+
+				TextArea info_result = new TextArea(
+						"Quality Threshold\n" + "\nIl programma è destinato all' operazione di \n"
+								+ "Data Mining che consiste nell' \"estrarre\" \n"
+								+ "informazioni da gruppi di dati molto voluminosi. \n"
+								+ "\nsfruttando segmentazione (o clustering)\n"
+								+ "si individuano gruppi con elementi omogenei\n"
+								+ "all’interno del gruppo e diversi\\n" + "da gruppo a gruppo\n (es. individuazione\n"
+								+ " di gruppi di consumatori con comportamenti simili)\n" + "\n");
+				info_result.setMinHeight(270);
+				info_result.setEditable(false);
+
+				grid_info.add(bottone_menu_info, 1, 1);
+				grid_info.add(info_result, 1, 2);
+
+				scene_info = new Scene(grid_info, 420, 340);
+				scene_info.getStylesheets().add("StyleProgram.css");
+				finestra.setScene(scene_info);
 			}
 		});
 
 		help_subMenu2.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
-				TextArea credits_t = new TextArea("a");
+				TextArea credits_t = new TextArea("\nIl programma è stato realizzato per \n"
+						+ "il progetto di Metodi Avanzati di Programmazione \n" + "del 2019 da Losciale Gianluca.\n"
+						+ "\nInformazioni di contatto:\n" + "e-mail:  vinci19997@gmail.com\n" + "\n");
 
 				Alert credits = new Alert(AlertType.NONE, credits_t.getText(), ButtonType.OK);
 				credits.show();
@@ -246,7 +274,7 @@ public class MainFxTest extends Application {
 		grid_menu.add(bottone_file, 1, 1);
 		grid_menu.add(bottone_db, 1, 2);
 		root_menu.setCenter(grid_menu);
-		scene_menu = new Scene(root_menu, 360, 180);
+		scene_menu = new Scene(root_menu, 400, 220);
 		scene_menu.getStylesheets().add("StyleProgram.css");
 
 		// pannello di errore //
@@ -302,7 +330,7 @@ public class MainFxTest extends Application {
 		bottone_chiudi_file.setStyle(" -fx-text-fill: rgb(248,107,111)");
 
 		TextArea file_result = new TextArea(); // area risultato file
-		file_result.setMinHeight(150);
+		file_result.setMinHeight(270);
 		file_result.setMaxWidth(350);
 		file_result.setEditable(false);
 
@@ -311,7 +339,7 @@ public class MainFxTest extends Application {
 		grid_result_file.add(bottone_file_ripeti, 1, 3);
 		grid_result_file.add(bottone_chiudi_file, 2, 3);
 
-		scene_result_file = new Scene(grid_result_file, 450, 300);
+		scene_result_file = new Scene(grid_result_file, 450, 370);
 		scene_result_file.getStylesheets().add("StyleProgram.css");
 
 		// pannello file (1) //
@@ -424,7 +452,7 @@ public class MainFxTest extends Application {
 		bottone_chiudi_db.setStyle(" -fx-text-fill: rgb(248,107,111)");
 
 		TextArea db_result = new TextArea(); // area risultato db
-		db_result.setMinHeight(150);
+		db_result.setMinHeight(270);
 		db_result.setMaxWidth(350);
 		db_result.setEditable(false);
 
@@ -433,7 +461,7 @@ public class MainFxTest extends Application {
 		grid_result_db.add(bottone_db_ripeti, 1, 3);
 		grid_result_db.add(bottone_chiudi_db, 2, 3);
 
-		scene_result_db = new Scene(grid_result_db, 450, 300);
+		scene_result_db = new Scene(grid_result_db, 450, 370);
 		scene_result_db.getStylesheets().add("StyleProgram.css");
 
 		// pannello db (2) //
@@ -446,6 +474,15 @@ public class MainFxTest extends Application {
 
 		TextField db_name = new TextField("playtennis");
 		TextField db_radius = new TextField("2");
+		db_radius.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+					final String newValue) {
+				if (!newValue.matches("\\d{0,4}([\\.]\\d{0,3})?")) {
+					db_radius.setText(oldValue);
+				}
+			}
+		});
 		Button bottone_carica_db = new Button("Calcola");
 		final Text actiontarget_db = new Text();
 
@@ -485,8 +522,10 @@ public class MainFxTest extends Application {
 						finestra.setScene(scene_error);
 						return;
 					} catch (ServerException err) {
-						error_result.setText("(503) Errore dal server \n");
+						error_result.setText(
+								"(503) Errore dal server \n" + "       Raggio eccessivo,il cluster risulta vuoto.");
 						finestra.setScene(scene_error);
+						err.printStackTrace();
 						return;
 					} catch (Error err) {
 						error_result.setText("Errore generico \n");

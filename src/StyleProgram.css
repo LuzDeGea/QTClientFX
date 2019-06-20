@@ -48,9 +48,19 @@
   	-fx-border-width:2.0px;
  }
 
- .dialog-pane > .content.label {
-  	-fx-padding: 0.5em 0.5em 0.5em 0.5em;
+ .dialog-pane > .content {
   	-fx-background-color: rgb(0,110,190);
    	-fx-text-fill:black;
-  	-fx-font-size:12.0px;
+  	-fx-font-size:12 pt;
+}
+
+.text-area {
+	text-area-background: rgb(0,110,190) ;
+	-fx-text-fill: white ;
+	-fx-font-weight: bold;
+	 -fx-font-size: 14 pt;
+}
+
+.text-area .content {
+    -fx-background-color: text-area-background ;
 }
