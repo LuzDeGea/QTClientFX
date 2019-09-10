@@ -13,8 +13,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -68,12 +70,17 @@ public class MainFxTest extends Application {
 	}
 
 	@Override
-	public void start(final Stage primaryStage) {
+	public void start(final Stage primaryStage) throws Exception {
 		try {
 			connetti("127.0.0.1", 8080);
 		} catch (IOException e4) {
 			e4.printStackTrace();
 		}
+
+		Parent root = FXMLLoader.load(getClass().getResource("QTClient_FX.fxml"));
+		primaryStage.setTitle("Grafica QT Client");
+		primaryStage.setScene(new Scene(root, 800, 500));
+		primaryStage.show();
 
 		finestra = primaryStage;
 		finestra.setTitle("QT");
@@ -483,7 +490,7 @@ public class MainFxTest extends Application {
 				}
 			}
 		});
-		Button bottone_carica_db = new Button("Calcola");
+		Button bottone_carica_db = new Button("Visualizza");
 		final Text actiontarget_db = new Text();
 
 		bottone_carica_db.setOnAction(new EventHandler<ActionEvent>() {
@@ -561,9 +568,9 @@ public class MainFxTest extends Application {
 			}
 		});
 		// visulizzazione iniziale //
-		finestra.setScene(scene_menu);
-		finestra.show();
-
+		/*
+		 * finestra.setScene(scene_menu); finestra.show();
+		 */
 	}
 
 	///////////////////////////////////////////////////////////

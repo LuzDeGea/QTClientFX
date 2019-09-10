@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.application.Application?>
+<?import javafx.beans.value.ChangeListener?>
+<?import javafx.beans.value.ObservableValue?>
+<?import javafx.event.ActionEvent?>
+<?import javafx.event.EventHandler?>
+<?import javafx.fxml.FXMLLoader?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos ?>
+<?import javafx.scene.* ?>
+<?import javafx.stage.Stage?>
+
+<BorderPane fx:controller="menu_controller" 
+		xmlns:fx="http://javafx.com/fxml" prefWidth="400" prefHeight="220">
+	<top>
+		<ManuBar>
+			<menus>
+				<Menu  text="Edit">
+					<items>
+						<MenuItem  text="Cambia Server">
+							<menus>
+								<menu fx:id="menuItem1_1" text="localHost (consigliato)"/>
+								<menu fx:id="menuItem1_2" text="nuovo server" />
+							</menus>
+						</MenuItem>
+					</items>
+				</Menu>
+				<Menu  text="Help">
+					<items>
+						<MenuItem fx:id="help_subMenu1" text="Info"/>
+						<MenuItem fx:id="help_subMenu1" text="Credits"/>
+					</items>
+				</Menu>
+			</menus>
+		</ManuBar>
+	</top>
+	<center>
+		<GridPane vgap="12" hgap="10" alignment="center">
+			<padding>
+				<Insets top="10" bottom="10" left="10" right="10"/>
+			</padding>
+			
+			<Label text="Seleiona una operazione:"  GridPane.columnIndex="1" GridPane.rowIndex="0" />
+			<Button text="Carica i cluster da file"  fx:id="bottone_file" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+			<Button text="Carica dati dal Database"  fx:id="bottone_db" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+		</GridPane>
+	</center>
+	<stylesheets>
+		<URL value="@StyleProgram.css"/>
+	</stylesheets>
+</BorderPane>
